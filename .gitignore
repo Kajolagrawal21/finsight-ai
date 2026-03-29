@@ -1,0 +1,13 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+mlflow.db
+mlruns/
+.DS_Store
+.vscode/
+test.py
