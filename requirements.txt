@@ -1,0 +1,52 @@
+# ─── Data & Storage ──────────────────────────────────────────
+yfinance==0.2.40
+kafka-python==2.0.2
+psycopg2-binary==2.9.9
+redis==5.0.1
+sqlalchemy==2.0.25
+pandas==2.2.0
+numpy==1.26.3
+
+# ─── Feature Engineering ─────────────────────────────────────
+ta==0.11.0                    # technical analysis indicators
+
+# ─── ML Models ───────────────────────────────────────────────
+scikit-learn==1.4.0
+xgboost==2.0.3
+prophet==1.1.5
+torch==2.2.0                  # LSTM + TFT
+pytorch-forecasting==1.6.1    # Temporal Fusion Transformer
+pytorch-lightning==2.2.0
+mlflow==2.19.0
+
+# ─── LLM / RAG / Agents ──────────────────────────────────────
+langchain>=0.3.10
+langchain-community>=0.3.10
+langgraph>=0.2.0
+langchain-ollama>=0.1.0
+qdrant-client==1.7.3
+sentence-transformers==2.4.0
+
+# ─── API Layer ───────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.27.1
+pydantic==2.10.6
+python-jose[cryptography]==3.3.0   # JWT
+passlib[bcrypt]==1.7.4
+httpx==0.26.0
+
+# ─── Dashboard ───────────────────────────────────────────────
+streamlit==1.31.0
+plotly==5.19.0
+streamlit-plotly-events==0.0.6
+
+# ─── Monitoring ──────────────────────────────────────────────
+prometheus-fastapi-instrumentator==6.1.0
+prometheus-client==0.20.0
+
+# ─── Dev & Testing ───────────────────────────────────────────
+pytest==7.4.4
+pytest-asyncio==0.23.4
+httpx==0.26.0
+python-dotenv==1.0.1
+loguru==0.7.2

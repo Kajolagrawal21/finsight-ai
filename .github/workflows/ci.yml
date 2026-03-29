@@ -1,0 +1,95 @@
+name: FinSight AI — CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  # ─── Lint & Test ────────────────────────────────────────────
+  test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        env:
+          POSTGRES_DB: finsight_test
+          POSTGRES_USER: finsight_user
+          POSTGRES_PASSWORD: finsight_pass
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install ruff black
+
+      - name: Lint with Ruff
+        run: ruff check .
+
+      - name: Format check with Black
+        run: black --check .
+
+      - name: Run tests
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_DB: finsight_test
+          POSTGRES_USER: finsight_user
+          POSTGRES_PASSWORD: finsight_pass
+          REDIS_HOST: localhost
+        run: pytest tests/ -v --tb=short
+
+  # ─── Build Docker Image ─────────────────────────────────────
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -t finsight-api:${{ github.sha }} -f api/Dockerfile .
+
+      - name: Build Dashboard image
+        run: docker build -t finsight-dashboard:${{ github.sha }} -f dashboard/Dockerfile .
+
+  # ─── Scheduled Model Retraining ─────────────────────────────
+  retrain:
+    name: Weekly Model Retraining
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run retraining pipeline
+        run: python ml/training/retrain_pipeline.py
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
