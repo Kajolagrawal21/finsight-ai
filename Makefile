@@ -1,7 +1,7 @@
 # ============================================================
 # FinSight AI — Makefile
 # ============================================================
-
+.PHONY: help setup up down logs producer consumer features dashboard api
 .PHONY: help setup up down logs producer consumer features clean
 
 help:
@@ -77,3 +77,9 @@ clean:
 	@echo "🧹 Cleaning up all data volumes..."
 	docker compose down -v --remove-orphans
 	@echo "✅ Clean complete!"
+
+dashboard:
+	PYTHONPATH=/Users/kajolagrawal/Desktop/finsight-ai streamlit run dashboard/app.py --server.port 8501
+
+api:
+	uvicorn api.main:app --host 0.0.0.0 --port 8001 --reload
