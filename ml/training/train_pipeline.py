@@ -26,7 +26,7 @@ DB_CONFIG = {
 }
 
 # Train on these symbols (start with 3, expand later)
-TRAINING_SYMBOLS = ["AAPL", "MSFT", "NVDA"]
+TRAINING_SYMBOLS = None
 
 
 def get_symbols_with_enough_data(min_rows: int = 200) -> list:
@@ -51,7 +51,10 @@ def run_training_pipeline():
 
     symbols = get_symbols_with_enough_data()
     # Filter to our training set
-    symbols = [s for s in TRAINING_SYMBOLS if s in symbols]
+    if TRAINING_SYMBOLS:
+        symbols = [s for s in TRAINING_SYMBOLS if s in symbols]
+        
+    
 
     if not symbols:
         logger.error("❌ No symbols with enough data! Run feature engineering first.")
